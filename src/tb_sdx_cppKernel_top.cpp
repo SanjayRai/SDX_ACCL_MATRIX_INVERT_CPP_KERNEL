@@ -14,31 +14,31 @@
 double getCPUTime();
 
 void gen_test_matrix(input_data_type a[NUMBER_OF_COMPUTE_UNITS], float twiddle) {
-  a[0].data_in[0][0] = 1.0; 
-  a[0].data_in[0][1] = 2.0;
-  a[0].data_in[0][2] = 3.0;
-  a[0].data_in[0][3] = 4.0;
-  a[0].data_in[0][4] = 1.0;
-  a[0].data_in[1][0] = 5.0;
-  a[0].data_in[1][1] = 6.0;
-  a[0].data_in[1][2] = 7.0;
-  a[0].data_in[1][3] = 8.0;
-  a[0].data_in[1][4] = 2.0;
-  a[0].data_in[2][0] = 2.0;
-  a[0].data_in[2][1] = 6.0;
-  a[0].data_in[2][2] = 4.0;
-  a[0].data_in[2][3] = 8.0;
-  a[0].data_in[2][4] = 3.0;
-  a[0].data_in[3][0] = 3.0;
-  a[0].data_in[3][1] = 1.0;
-  a[0].data_in[3][2] = 1.0;
-  a[0].data_in[3][3] = 2.0;
-  a[0].data_in[3][4] = 4.0;
-  a[0].data_in[4][0] = 1.0;
-  a[0].data_in[4][1] = 4.0;
-  a[0].data_in[4][2] = 5.0;
-  a[0].data_in[4][3] = 6.0;
-  a[0].data_in[4][4] = 5.0;
+  a[0].data_in[0][0] = 1.0f * twiddle; 
+  a[0].data_in[0][1] = 2.0f * twiddle;
+  a[0].data_in[0][2] = 3.0f * twiddle;
+  a[0].data_in[0][3] = 4.0f * twiddle;
+  a[0].data_in[0][4] = 1.0f * twiddle;
+  a[0].data_in[1][0] = 5.0f * twiddle;
+  a[0].data_in[1][1] = 6.0f * twiddle;
+  a[0].data_in[1][2] = 7.0f * twiddle;
+  a[0].data_in[1][3] = 8.0f * twiddle;
+  a[0].data_in[1][4] = 2.0f * twiddle;
+  a[0].data_in[2][0] = 2.0f * twiddle;
+  a[0].data_in[2][1] = 6.0f * twiddle;
+  a[0].data_in[2][2] = 4.0f * twiddle;
+  a[0].data_in[2][3] = 8.0f * twiddle;
+  a[0].data_in[2][4] = 3.0f * twiddle;
+  a[0].data_in[3][0] = 3.0f * twiddle;
+  a[0].data_in[3][1] = 1.0f * twiddle;
+  a[0].data_in[3][2] = 1.0f * twiddle;
+  a[0].data_in[3][3] = 2.0f * twiddle;
+  a[0].data_in[3][4] = 4.0f * twiddle;
+  a[0].data_in[4][0] = 1.0f * twiddle;
+  a[0].data_in[4][1] = 4.0f * twiddle;
+  a[0].data_in[4][2] = 5.0f * twiddle;
+  a[0].data_in[4][3] = 6.0f * twiddle;
+  a[0].data_in[4][4] = 5.0f * twiddle;
 
   for (int cu = 1; cu <  NUMBER_OF_COMPUTE_UNITS;cu++) { 
       for (int i = 0; i <  DIM;i++) { 

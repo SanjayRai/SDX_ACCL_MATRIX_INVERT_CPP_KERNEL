@@ -4,7 +4,7 @@
 
 #include <CL/opencl.h>
 
-template <class input_data_type, class output_data_type, int NUM_OF_COMPUTE_UNITS>
+template <class input_data_type, class output_data_type, int NUM_OF_COMPUTE_UNITS, int MAX_ITERATION>
 class fpga_hw_accel {
 
 
@@ -175,12 +175,11 @@ class fpga_hw_accel {
                                                 // Set the arguments to our compute kernel
                                                 err = CL_SUCCESS;
                                                 for(compute_unit = 0; compute_unit < NUM_OF_COMPUTE_UNITS; compute_unit++) {
-                                                    for (i = 0 ; i < (num_input_args+num_output_args); i++ ) {
-                                                        if (i < num_input_args) {
+                                                    for (i = 0 ; i < num_input_args; i++ ) {
                                                             err |= clSetKernelArg(kernel[compute_unit], i, sizeof(cl_mem), &inputs[compute_unit][i]);
-                                                        } else {
-                                                            err |= clSetKernelArg(kernel[compute_unit], i, sizeof(cl_mem), &outputs[compute_unit][(i- num_input_args)]);
-                                                        }
+                                                    }
+                                                    for (i = 0 ; i < num_output_args; i++ ) {
+                                                            err |= clSetKernelArg(kernel[compute_unit], (num_input_args+i), sizeof(cl_mem), &outputs[compute_unit][i]);
                                                     }
                                                 }
                                                 if (err != CL_SUCCESS) {
@@ -202,14 +201,13 @@ class fpga_hw_accel {
         } // __SRAI clGetPlatformIDs
     }
 
-    int run_fpga_accel (input_data_type **in_args, output_data_type **results_out) {
+    int run_fpga_accel (input_data_type *in_args, output_data_type *results_out) {
         int i;
         int err_k[NUM_OF_COMPUTE_UNITS];
         int compute_unit;
         bool SUCESSFUL_EXIT_CODE;
         bool enqueue_error;
 
-        cl_event writeevent[NUM_OF_COMPUTE_UNITS];
         cl_event readevent[NUM_OF_COMPUTE_UNITS];
 
         
@@ -220,7 +218,7 @@ class fpga_hw_accel {
         enqueue_error = 0;
         for(compute_unit = 0; compute_unit < NUM_OF_COMPUTE_UNITS; compute_unit++) {
             for (i = 0 ; i < num_input_args; i++ ) {
-                err_k[compute_unit] = clEnqueueWriteBuffer(commands, inputs[compute_unit][i], CL_TRUE, 0, in_args_size_vec[i], *in_args, 0, NULL, &writeevent[compute_unit]);
+                err_k[compute_unit] = clEnqueueWriteBuffer(commands, inputs[compute_unit][i], CL_TRUE, 0, in_args_size_vec[i], in_args, 0, NULL, NULL);
                 in_args++;
             }
         }
@@ -235,19 +233,19 @@ class fpga_hw_accel {
             printf("Test failed\n");
             SUCESSFUL_EXIT_CODE = 0;
         } else {
-            for(compute_unit = 0; compute_unit < NUM_OF_COMPUTE_UNITS; compute_unit++) {
-                clWaitForEvents(1, &writeevent[compute_unit]);
-            }
             // Execute the kernel over the entire range of input data set
             // using the maximum number of work group items for this device
             
+
             enqueue_error = 0;
-            for(compute_unit = 0; compute_unit < NUM_OF_COMPUTE_UNITS; compute_unit++) {
-                err_k[compute_unit] = clEnqueueTask(commands, kernel[compute_unit], 0, NULL, NULL);
-            }
-            for(compute_unit = 0; compute_unit < NUM_OF_COMPUTE_UNITS; compute_unit++) {
-                if (err_k[compute_unit] != CL_SUCCESS) {
-                    enqueue_error = 1;
+            for(int local_size = 0; local_size < MAX_ITERATION; local_size++) {
+                for(compute_unit = 0; compute_unit < NUM_OF_COMPUTE_UNITS; compute_unit++) {
+                    err_k[compute_unit] = clEnqueueTask(commands, kernel[compute_unit], 0, NULL, NULL);
+                }
+                for(compute_unit = 0; compute_unit < NUM_OF_COMPUTE_UNITS; compute_unit++) {
+                    if (err_k[compute_unit] != CL_SUCCESS) {
+                        enqueue_error = 1;
+                    }
                 }
             }
             if (enqueue_error) {
@@ -259,7 +257,7 @@ class fpga_hw_accel {
                 enqueue_error = 0;
                 for(compute_unit = 0; compute_unit < NUM_OF_COMPUTE_UNITS; compute_unit++) {
                     for (i = 0 ; i < num_output_args; i++ ) {
-                        err_k[compute_unit] = clEnqueueReadBuffer( commands, outputs[compute_unit][i], CL_TRUE, 0, out_args_size_vec[i], *results_out, 0, NULL, &readevent[compute_unit]);
+                        err_k[compute_unit] = clEnqueueReadBuffer( commands, outputs[compute_unit][i], CL_TRUE, 0, out_args_size_vec[i], results_out, 0, NULL, &readevent[compute_unit]);
                         results_out++;
                     }
                 }

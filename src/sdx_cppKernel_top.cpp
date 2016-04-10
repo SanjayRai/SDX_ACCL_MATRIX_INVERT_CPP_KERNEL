@@ -4,8 +4,9 @@
 
 void sdx_cppKernel_top(input_data_type *a, output_data_type *a_inv)
 {
-#pragma HLS INTERFACE m_axi port=a offset=slave bundle=gmem depth=16
-#pragma HLS INTERFACE m_axi port=a_inv offset=slave bundle=gmem depth=16
+#pragma HLS DATAFLOW
+#pragma HLS INTERFACE m_axi port=a offset=slave bundle=gmem depth=8192
+#pragma HLS INTERFACE m_axi port=a_inv offset=slave bundle=gmem depth=8192
 #pragma HLS INTERFACE s_axilite port=a bundle=control
 #pragma HLS INTERFACE s_axilite port=a_inv bundle=control
 #pragma HLS INTERFACE s_axilite port=return bundle=control

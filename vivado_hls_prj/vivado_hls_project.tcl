@@ -1,8 +1,10 @@
+set XILINX_OPENCL /home/applications/Xilinx/SDAccel/2015.4
+
 open_project vhls_prj
 set_top sdx_cppKernel_top
 
 add_files -tb ../src/getCPUTime.cpp
-add_files -tb ../src/tb_sdx_cppKernel_top.cpp -cflags "-DVHLS_FLOW -DGPP_ONLY_FLOW -I/home/applications/Xilinx/SDAccel/2015.4/runtime/include/1_2 -I/home/applications/Xilinx/SDAccel/2015.4/Vivado_HLS/include -L/home/applications/Xilinx/SDAccel/2015.4/runtime/lib/x86_64 -lrt"
+add_files -tb ../src/tb_sdx_cppKernel_top.cpp -cflags "-DVHLS_FLOW -DGPP_ONLY_FLOW -I$XILINX_OPENCL/runtime/include/1_2 -I$XILINX_OPENCL/Vivado_HLS/include -L$XILINX_OPENCL/runtime/lib/x86_64 -lrt"
 add_files ../src/matrix_utility_class.h
 add_files ../src/matrix_determinant_class.h
 add_files ../src/matrix_operation_wrapper.h
